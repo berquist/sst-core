@@ -36,9 +36,6 @@ dnl Work out the C++ standard which we are going to use
 AX_CXX_COMPILE_STDCXX_17(noext)
 
 CXXFLAGS="$CXXFLAGS -std=c++17"
-#AS_IF([test "x$found_cxx1y" = "xyes"],
-#        [CXXFLAGS="$CXXFLAGS $SST_CXX1Y_FLAGS"],
-#        [CXXFLAGS="$CXXFLAGS $SST_CXX0X_FLAGS"])
 
 # The combination of newer versions of Clang changing the default behavior
 # from `-ffp-contract=off` to `-ffp-contract=on` and running on ARM due to the

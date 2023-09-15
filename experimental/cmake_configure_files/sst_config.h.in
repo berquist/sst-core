@@ -1,6 +1,4 @@
-/* src/sst/core/sst_config.h.in.  Generated from cmake. 
- * Tries hard to mirror the file created by by autoheader.  
- */
+/* src/sst/core/sst_config.h.in.  Generated from cmake.  */
 
 /* Define to 1 if you have the `argz_add' function. */
 #cmakedefine HAVE_ARGZ_ADD 1
@@ -29,11 +27,14 @@
 /* Defines if the backtrace function is avalible */
 #cmakedefine HAVE_BACKTRACE 1
 
+/* Define to 1 if you have the <c_asm.h> header file. */
+#cmakedefine HAVE_C_ASM_H 1
+
 /* Define to 1 if you have the `closedir' function. */
 #cmakedefine HAVE_CLOSEDIR 1
 
-/* Define to 1 if you have the <c_asm.h> header file. */
-#cmakedefine HAVE_C_ASM_H 1
+/* Define if the compiler supports basic C++17 syntax */
+#cmakedefine HAVE_CXX17
 
 /* Defines whether we have the curses library */
 #cmakedefine HAVE_CURSES 1
@@ -92,6 +93,9 @@
 
 /* Define to 1 if you have the <mach-o/dyld.h> header file. */
 #cmakedefine HAVE_MACH_O_DYLD_H 1
+
+/* Define to 1 if you have the <memory.h> header file. */
+#cmakedefine HAVE_MEMORY_H
 
 /* Define to 1 if you have the `opendir' function. */
 #cmakedefine HAVE_OPENDIR 1
@@ -208,6 +212,9 @@
 /* Defines the CFLAGS used to build SST */
 #cmakedefine SST_CFLAGS
 
+/* EXPERIMENTAL Tracks clock handler execution time and counters */
+#cmakedefine SST_CLOCK_PROFILING 1
+
 /* Defines compile for Mac OS-X */
 #cmakedefine SST_COMPILE_MACOSX 1
 
@@ -238,6 +245,13 @@
 /* Whether to enable preview build */
 #cmakedefine SST_ENABLE_PREVIEW_BUILD
 
+/* EXPERIMENTAL Tracks event and communication time and counters */
+#cmakedefine SST_EVENT_PROFILING 1
+
+/* EXPERIMENTAL Enables nanosecond resolution clock. Disable for gettimeofday
+   microsecond resolution */
+#cmakedefine SST_HIGH_RESOLUTION_CLOCK 1
+
 /* Defines the location SST will be installed in */
 #cmakedefine SST_INSTALL_PREFIX "@SST_INSTALL_PREFIX@"
 
@@ -253,11 +267,27 @@
 /* Defines the MPI C++ compilers used to build SST */
 #cmakedefine SST_MPICXX
 
+/* EXPERIMENTAL Required for all performance tracking. Enables file creation
+   and final output */
+#cmakedefine SST_PERFORMANCE_INSTRUMENTING 1
+
+/* EXPERIMENTAL Periodically prints performance information to files */
+#cmakedefine SST_PERIODIC_PRINT 1
+
+/* EXPERIMENTAL Tune to affect how often files are written. */
+#cmakedefine SST_PERIODIC_PRINT_THRESHOLD 1
+
 /* Defines the CPPFLAGS needed to compile Python into SST */
 #cmakedefine SST_PYTHON_CPPFLAGS
 
 /* Defines the LDFLAGS needed to compile Python into SST */
 #cmakedefine SST_PYTHON_LDFLAGS
+
+/* EXPERIMENTAL Tracks execution time for each rank. */
+#cmakedefine SST_RUNTIME_PROFILING 1
+
+/* EXPERIMENTAL Tracks synchronization time and count */
+#cmakedefine SST_SYNC_PROFILING 1
 
 /* Test Frameworks will be sym-linked instead of copied on install */
 #cmakedefine SST_TESTFRAMEWORK_DEV

@@ -31,6 +31,9 @@ jobs:
         with-mpi:
           - true
           - false
+        compiler:
+          - {cc: "clang", cxx: "clang++"}
+          - {cc: "gcc", cxx: "g++"}
         exclude:
           - os: macos-13
             build-system: {name: "cmake", generator: "Unix Makefiles"}
@@ -38,6 +41,13 @@ jobs:
           - os: ubuntu-22.04
             build-system: {name: "cmake", generator: "Unix Makefiles"}
             with-mpi: false
+            # Force "obvious" default compilers (gcc on Linux, clang on macOS).
+          - os: macos-13
+            compiler: {cc: "gcc", cxx: "g++"}
+          - os: macos-14
+            compiler: {cc: "gcc", cxx: "g++"}
+          - os: ubuntu-22.04
+            compiler: {cc: "clang", cxx: "clang++"}
     runs-on: ${{ matrix.os }}
     name: test:${{ matrix.os }}/${{ matrix.build-system.name }}-${{ matrix.build-system.generator }}/mpi-${{ matrix.with-mpi }}
     env:
@@ -48,7 +58,7 @@ jobs:
     steps:
 
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: install prerequisites macOS
         run: brew install coreutils ncurses
@@ -80,7 +90,10 @@ jobs:
 
       - name: autotools configure
         run: |
+          export CC=${{ matrix.compiler.cc }}
+          export CXX=${{ matrix.compiler.cxx }}
           ${{ github.workspace }}/autogen.sh
+          # out-of-source build
           mkdir -p "${CORE_BUILD_PATH}"
           cd "${CORE_BUILD_PATH}"
           ${{ github.workspace }}/configure \
@@ -105,6 +118,8 @@ jobs:
             -S ${{ github.workspace }}/experimental \
             -B "${CORE_BUILD_PATH}" \
             -DCMAKE_INSTALL_PREFIX="${INSTALL_PATH}" \
+            -DCMAKE_C_COMPILER=${{ matrix.compiler.cc }} \
+            -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cxx }} \
             -DSST_DISABLE_MPI="${SST_DISABLE_MPI_CMAKE}" \
             -G'${{ matrix.build-system.generator }}'
         if: ${{ matrix.build-system.name == 'cmake' }}

@@ -4,7 +4,13 @@ name: ci
 # yamllint disable-line rule:truthy
 on:
   push:
+  # https://github.com/orgs/community/discussions/25722#discussioncomment-3248917
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
 
 concurrency:
   group: ci-${{github.ref}}-${{github.event.pull_request.number || github.run_number}}
@@ -19,3 +25,5 @@ jobs:
     steps:
       - name: Success
         run: "true"
+  build-and-test:
+    uses: ./.github/workflows/test.yml

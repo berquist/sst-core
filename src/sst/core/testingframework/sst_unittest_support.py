@@ -1203,6 +1203,10 @@ def testing_compare_filtered_diff(test_name, outfile, reffile, sort=False, filte
     # Get the diff between the files
     diff = difflib.unified_diff(out_lines,ref_lines,outfile,reffile,n=1)
 
+    # difflib doesn't know anything about numbers, only text.
+    # For lines that contains platform- or compiler-dependent
+    # floating point output, apply a blanket threshold on those fields.
+
     # Write the diff to a file and count the number of lines of output
     # to determine if they matched or not (the output of the diff is a
     # generator, so the only way to see if it's empty is to start to

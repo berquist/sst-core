@@ -709,7 +709,7 @@ class SSTTestSuiteResultData:
 
     def add_skip(self, test):
         """ Add a test to the skip record"""
-        self._tests_skiped.append(test)
+        self._tests_skipped.append(test)
 
     def add_expected_failure(self, test):
         """ Add a test to the expected failure record"""
@@ -731,9 +731,9 @@ class SSTTestSuiteResultData:
         """ Return the tests errored list"""
         return self._tests_errored
 
-    def get_skiped(self):
+    def get_skipped(self):
         """ Return the tests skipped list"""
-        return self._tests_skiped
+        return self._tests_skipped
 
     def get_expectedfailed(self):
         """ Return the expected failed list"""

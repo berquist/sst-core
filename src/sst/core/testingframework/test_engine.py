@@ -103,7 +103,7 @@ MODE_TEST_SST_CORE = 1
 
 ################################################################################
 
-class TestEngine():
+class TestEngine:
     """ This is the main Test Engine, it will init arguments, parsed params,
         create output directories, and then Discover and Run the tests.
     """
@@ -138,7 +138,7 @@ class TestEngine():
 
 ####
 
-    def discover_and_run_tests(self):
+    def discover_and_run_tests(self) -> None:
         """ Create the output directories, then discover the tests, and then
             run them using pythons unittest module
 
@@ -178,8 +178,11 @@ class TestEngine():
             test_runner = SSTTextTestRunner(verbosity=test_engine_globals.TESTENGINE_VERBOSITY,
                                             failfast=self._fail_fast,
                                             resultclass=SSTTextTestResult)
+
             # run the tests
             sst_tests_results = test_runner.run(self._sst_full_test_suite)
+
+            # save the results
 
             if not test_runner.did_tests_pass(sst_tests_results):
                 exit(1)

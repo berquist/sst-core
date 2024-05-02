@@ -28,14 +28,13 @@ import test_engine_globals
 
 ################################################################################
 
-class OSCommand():
+class OSCommand:
     """ Enables to run subprocess commands in a different thread with a TIMEOUT option.
         This will return a OSCommandResult object.
 
         Based on a modified version of jcollado's solution:
         http://stackoverflow.com/questions/1191374/subprocess-with-timeout/4825933#4825933
     """
-###
 
     def __init__(self, cmd_str, output_file_path=None, error_file_path=None,
                  set_cwd=None, use_shell=False):
@@ -265,11 +264,11 @@ def check_param_type(varname, vardata, datatype):
 
 ################################################################################
 
-def strclass(cls):
+def strclass(cls) -> str:
     """ Return the classname of a class"""
     return "%s" % (cls.__module__)
 
-def strqual(cls):
+def strqual(cls) -> str:
     """ Return the qualname of a class"""
     return "%s" % (_qualname(cls))
 

@@ -26,6 +26,7 @@ import tarfile
 import shutil
 import difflib
 import configparser
+from typing import Tuple
 
 import test_engine_globals
 from test_engine_support import OSCommand
@@ -630,7 +631,7 @@ def sstsimulator_conf_does_have_key(section, key):
 # Logging Functions
 ################################################################################
 
-def log(logstr):
+def log(logstr: str) -> None:
     """ Log a general message.
 
         This will not output unless we are outputing in >= normal mode.
@@ -644,7 +645,7 @@ def log(logstr):
 
 ###
 
-def log_forced(logstr):
+def log_forced(logstr: str) -> None:
     """ Log a general message, no matter what the verbosity is.
 
         if in the middle of testing, it will precede with a '\\n' to slip
@@ -661,7 +662,7 @@ def log_forced(logstr):
 
 ###
 
-def log_debug(logstr):
+def log_debug(logstr: str) -> None:
     """ Log a 'DEBUG:' message.
 
         Log will only happen if in debug verbosity mode.
@@ -675,7 +676,7 @@ def log_debug(logstr):
 
 ###
 
-def log_failure(logstr):
+def log_failure(logstr: str) -> None:
     """ Log a test failure.
 
         Log will only happen if in log failure mode.
@@ -694,7 +695,7 @@ def log_failure(logstr):
 
 ###
 
-def log_info(logstr, forced=True):
+def log_info(logstr: str, forced: bool = True) -> None:
     """ Log a 'INFO:' message.
 
         Args:
@@ -710,7 +711,7 @@ def log_info(logstr, forced=True):
         log(finalstr)
 ###
 
-def log_error(logstr):
+def log_error(logstr: str) -> None:
     """ Log a 'ERROR:' message.
 
         Log will occur no matter what the verbosity is
@@ -725,7 +726,7 @@ def log_error(logstr):
 
 ###
 
-def log_warning(logstr):
+def log_warning(logstr: str) -> None:
     """ Log a 'WARNING:' message.
 
         Log will occur no matter what the verbosity is
@@ -739,7 +740,7 @@ def log_warning(logstr):
 
 ###
 
-def log_fatal(errstr):
+def log_fatal(errstr: str) -> None:
     """ Log a 'FATAL:' message.
 
         Log will occur no matter what the verbosity is and
@@ -755,7 +756,7 @@ def log_fatal(errstr):
 
 ###
 
-def log_testing_note(note_str):
+def log_testing_note(note_str: str) -> None:
     """ Log a testing note
 
         Add a testing note that will be displayed at the end of the test run
@@ -1418,7 +1419,7 @@ def os_cat(filepath, echo_out=True):
         log("{0}".format(rtn.output()))
     return rtn.output()
 
-def os_symlink_file(srcdir, destdir, filename):
+def os_symlink_file(srcdir: str, destdir: str, filename: str) -> None:
     """ Create a symlink of a file
 
         Args:
@@ -1433,7 +1434,7 @@ def os_symlink_file(srcdir, destdir, filename):
     dstfilepath = "{0}/{1}".format(destdir, filename)
     os.symlink(srcfilepath, dstfilepath)
 
-def os_symlink_dir(srcdir, destdir):
+def os_symlink_dir(srcdir: str, destdir: str) -> None:
     """ Create a symlink of a directory
 
         Args:
@@ -1444,7 +1445,7 @@ def os_symlink_dir(srcdir, destdir):
     check_param_type("destdir", destdir, str)
     os.symlink(srcdir, destdir)
 
-def os_awk_print(in_str, fields_index_list):
+def os_awk_print(in_str: str, fields_index_list) -> str:
     """ Perform an awk / print (equivalent) command which returns specific
         fields of an input string as a string.
 
@@ -1456,10 +1457,7 @@ def os_awk_print(in_str, fields_index_list):
         Returns:
             (str) Space separated string of extracted fields.
     """
-    if isinstance(in_str, bytes):
-        check_param_type("in_str", in_str, bytes)
-    else:
-        check_param_type("in_str", in_str, str)
+    check_param_type("in_str", in_str, str)
     check_param_type("fields_index_list", fields_index_list, list)
     for index, field_index in enumerate(fields_index_list):
         check_param_type("field_index - {0}".format(index), field_index, int)
@@ -1603,7 +1601,7 @@ def os_extract_tar(tarfilepath, targetdir="."):
 ### Platform Specific Support Functions
 ################################################################################
 
-def _get_linux_distribution():
+def _get_linux_distribution() -> Tuple[str, str]:
     """ Return the linux distribution info as a tuple"""
     # The method linux_distribution is depricated in deprecated in Py3.5
     _linux_distribution = getattr(platform, 'linux_distribution', None)
@@ -1632,20 +1630,16 @@ def _get_linux_distribution():
 
 ###
 
-def _get_linux_version(filepath, sep):
+def _get_linux_version(filepath: str, sep: str) -> str:
     """ return the linux OS version as a string"""
     # Find the first digit + period in the tokenized string list
     with open(filepath, 'r') as filehandle:
         for line in filehandle:
-            #print("found line = " + line)
             word_list = line.split(sep)
             for word in word_list:
-                #print("word =" + word)
                 m_data = re.search(r"[\d.]+", word)
-                #print("found_ver = {0}".format(m_data))
                 if m_data is not None:
                     found_ver = m_data.string[m_data.start():m_data.end()]
-                    #print("found_ver = {0}".format(found_ver))
                     return found_ver
     return "undefined"
 

@@ -23,7 +23,6 @@ import time
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 import json
-from dataclasses import dataclass, field
 
 ################################################################################
 
@@ -386,7 +385,7 @@ class SSTTextTestResult(unittest.TestResult):
             "result": extended,
             "time": testruntime,
         }
-        # print(json.dumps(result))
+        print(json.dumps(result))
         if self.showAll:
             self.stream.write(self.indent)
             self.stream.write(colour(extended))
@@ -683,17 +682,18 @@ class SSTTestSuite(TestSuiteBaseClass):
 
 ################################################################################
 
-@dataclass
 class SSTTestSuiteResultData:
     """ Support class to hold result data for a specific testsuite
         Results are stored as lists of test names
     """
-    _tests_passing: List[SSTTextTestResult] = field(default_factory=list)
-    _tests_failing: List[SSTTextTestResult] = field(default_factory=list)
-    _tests_errored: List[SSTTextTestResult] = field(default_factory=list)
-    _tests_skiped: List[SSTTextTestResult] = field(default_factory=list)
-    _tests_expectedfailed: List[SSTTextTestResult] = field(default_factory=list)
-    _tests_unexpectedsuccess: List[SSTTextTestResult] = field(default_factory=list)
+
+    def __init__(self, *args, **kwargs):
+        self._tests_passing = list()
+        self._tests_failing = list()
+        self._tests_errored = list()
+        self._tests_skipped = list()
+        self._tests_expectedfailed = list()
+        self._tests_unexpectedsuccess = list()
 
     def add_success(self, test):
         """ Add a test to the success record"""

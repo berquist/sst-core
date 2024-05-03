@@ -29,14 +29,13 @@ import threading
 import time
 
 import test_engine_globals
-from sst_unittest_support import *
+from sst_unittest_support import host_os_get_num_cores_on_system, host_os_get_distribution_type, host_os_get_distribution_version, log_debug, sstsimulator_conf_get_value_str, log_error, host_os_get_num_cores_on_system, testing_merge_mpi_files, log_fatal
 from test_engine_support import OSCommand
 from test_engine_support import check_param_type
 from test_engine_support import strclass
 from test_engine_support import strqual
 from test_engine_junit import JUnitTestSuite
 from test_engine_junit import junit_to_xml_report_file
-#from test_engine_junit import junit_to_xml_report_string
 
 class SSTTestCase(unittest.TestCase):
     """ This class is main SSTTestCase class for the SST Testing Frameworks
@@ -57,12 +56,12 @@ class SSTTestCase(unittest.TestCase):
         self._testsuite_dirpath = parent_module_path
         #log_forced("SSTTestCase: __init__() - {0}".format(self.testname))
         self.initializeClass(self.testname)
-        self._start_test_time = time.time()
-        self._stop_test_time = time.time()
+        self._start_test_time = 0.0
+        self._stop_test_time = 0.0
 
 ###
 
-    def initializeClass(self, testname):
+    def initializeClass(self, testname: str) -> None:
         """ The method is called by the Frameworks immediately before class is
         initialized.
 
@@ -83,7 +82,7 @@ class SSTTestCase(unittest.TestCase):
 
 ###
 
-    def setUp(self):
+    def setUp(self) -> None:
         """ The method is called by the Frameworks immediately before a test is run
 
         **NOTICE**:
@@ -106,7 +105,7 @@ class SSTTestCase(unittest.TestCase):
 
 ###
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         """ The method is called by the Frameworks immediately after a test finishes
 
         **NOTICE**:
@@ -162,7 +161,7 @@ class SSTTestCase(unittest.TestCase):
 
 ###
 
-    def get_testsuite_name(self):
+    def get_testsuite_name(self) -> str:
         """ Return the testsuite (module) name
 
         Returns:
@@ -172,7 +171,7 @@ class SSTTestCase(unittest.TestCase):
 
 ###
 
-    def get_testcase_name(self):
+    def get_testcase_name(self) -> str:
         """ Return the testcase name
 
         Returns:
@@ -181,7 +180,7 @@ class SSTTestCase(unittest.TestCase):
         return "{0}".format(strqual(self.__class__))
 ###
 
-    def get_testsuite_dir(self):
+    def get_testsuite_dir(self) -> str:
         """ Return the directory path of the testsuite that is being run
 
         Returns:
@@ -191,7 +190,7 @@ class SSTTestCase(unittest.TestCase):
 
 ###
 
-    def get_test_output_run_dir(self):
+    def get_test_output_run_dir(self) -> str:
         """ Return the path of the test output run directory
 
         Returns:
@@ -201,7 +200,7 @@ class SSTTestCase(unittest.TestCase):
 
 ###
 
-    def get_test_output_tmp_dir(self):
+    def get_test_output_tmp_dir(self) -> str:
         """ Return the path of the test tmp directory
 
         Returns:
@@ -211,13 +210,12 @@ class SSTTestCase(unittest.TestCase):
 
 ###
 
-    def get_test_runtime_sec(self):
+    def get_test_runtime_sec(self) -> str:
         """ Return the current runtime (walltime) of the test
 
         Returns:
             (float) The runtime of the test in seconds
         """
-        self._stop_test_time = time.time()
         return self._stop_test_time - self._start_test_time
 
 
@@ -412,7 +410,6 @@ def tearDownModule():
                          test_engine_globals.TESTRUN_JUNIT_TESTCASE_DICTLISTS['singlethread'])
 
     # Write out Test Suite Results
-    #log_forced(junit_to_xml_report_string([t_s]))
     xml_out_filepath = ("{0}/{1}.xml".format(test_engine_globals.TESTOUTPUT_XMLDIRPATH,
                                              test_engine_globals.TESTRUN_SINGTHREAD_TESTSUITE_NAME))
 
@@ -444,7 +441,7 @@ def setUpModuleConcurrent(test):
 #    testcase_name = test.get_testcase_name()
 #    log_forced("\nSSTTestCase - setUpModuleConcurrent suite={0}; case={1}; test={2}".\
 #    format(testsuite_name, testcase_name, test))
-    if not testsuite_name in test_engine_globals.TESTRUN_JUNIT_TESTCASE_DICTLISTS:
+    if testsuite_name not in test_engine_globals.TESTRUN_JUNIT_TESTCASE_DICTLISTS:
         test_engine_globals.TESTRUN_JUNIT_TESTCASE_DICTLISTS[testsuite_name] = []
 
 ###
@@ -476,7 +473,6 @@ def tearDownModuleConcurrent(test):
                          test_engine_globals.TESTRUN_JUNIT_TESTCASE_DICTLISTS[testsuite_name])
 
     # Write out Test Suite Results
-    #log_forced(junit_to_xml_report_string([t_s]))
     xml_out_filepath = ("{0}/{1}.xml".format(test_engine_globals.TESTOUTPUT_XMLDIRPATH,
                                              testsuite_name))
 

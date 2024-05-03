@@ -26,8 +26,9 @@ import json
 
 import test_engine_globals
 from sst_unittest import *
-from sst_unittest_support import log_fatal, log_forced, log_info, log
+from sst_unittest_support import log_fatal, log_forced, log_info, log, test_output_get_run_dir, log_testing_note
 from test_engine_unittest import SSTTextTestResult, SSTTextTestRunner, SSTTestSuite, verify_concurrent_test_engine_available
+from test_engine_support import OSCommand
 
 ################################################################################
 
@@ -103,6 +104,20 @@ MODE_TEST_ELEMENTS = 0
 MODE_TEST_SST_CORE = 1
 
 ################################################################################
+
+class Config:
+    def __init__(self):
+        self.python_version = self.version_info
+        cmd = "sst --version"
+        rtn = OSCommand(cmd).run()
+        sstcoreversion = rtn.output()
+        self.sstcoreversion = sstcoreversion.replace("SST-Core Version ", "").rstrip()
+        self.num_cores = host_os_get_num_cores_on_system()
+        concurrent_txt = ""
+        if test_engine_globals.TESTENGINE_CONCURRENTMODE:
+            concurrent_txt = f"[CONCURRENTLY ({test_engine_globals.TESTENGINE_THREADLIMIT} Testing Threads)]"
+        self.concurrent_txt = concurrent_txt
+
 
 class TestEngine:
     """ This is the main Test Engine, it will init arguments, parsed params,
@@ -362,26 +377,18 @@ class TestEngine:
 
 ####
 
-    def _display_startup_info(self):
+    def _display_startup_info(self) -> None:
         """ Display the Test Engine Startup Information"""
 
-        ver = sys.version_info
-        concurrent_txt = ""
+        config = Config()
 
-        cmd = "sst --version"
-        rtn = OSCommand(cmd).run()
-        sstcoreversion = rtn.output()
-        sstcoreversion = sstcoreversion.replace("SST-Core Version ", "").rstrip()
-
-        num_cores = host_os_get_num_cores_on_system()
-
-        if test_engine_globals.TESTENGINE_CONCURRENTMODE:
-            concurrent_txt = "[CONCURRENTLY ({0} Testing Threads)]".\
-            format(test_engine_globals.TESTENGINE_THREADLIMIT)
+        ver = config.python_version
+        sstcoreversion = config.sstcoreversion
+        num_cores = config.num_cores
 
         # Display operations info if we are unning in a verbose mode
         log_info(("SST Test Engine Instantiated - Running") +
-                 (" tests on {0} {1}").format(self._test_type_str, concurrent_txt),
+                 (" tests on {0} {1}").format(self._test_type_str, config.concurrent_txt),
                  forced=False)
 
         log_info(("Test Platform = {0}".format(host_os_get_distribution_type())) +
@@ -390,7 +397,7 @@ class TestEngine:
         log_info("Running on Python Version = {0}.{1}.{2}".\
         format(ver[0], ver[1], ver[2]), forced=False)
 
-        log_info("TestEngine Version = {0}".format(sstcoreversion), forced=False)
+        log_info(f"TestEngine Version = {sstcoreversion}", forced=False)
 
         log_info("Available Cores = {0}; Num Ranks = {1}; Num Threads = {2}".format(num_cores, \
             test_engine_globals.TESTENGINE_SSTRUN_NUMRANKS, \
@@ -399,7 +406,7 @@ class TestEngine:
         # Check to see if we are using up all the cores on the system
         # in concurrent mode, warn user of possible failures
         if test_engine_globals.TESTENGINE_CONCURRENTMODE:
-            num_cores_avail = host_os_get_num_cores_on_system()
+            num_cores_avail = num_cores
             threads_used = test_engine_globals.TESTENGINE_THREADLIMIT
             ranks_used = test_engine_globals.TESTENGINE_SSTRUN_NUMRANKS
             cores_used = threads_used * ranks_used
@@ -769,7 +776,7 @@ class TestEngine:
 
     def _save_results(self, results: "SSTTextTestResult") -> None:
         to_serialize = dict()
-        run_dir = test_engine_globals.TESTOUTPUT_RUNDIRPATH
+        run_dir = test_output_get_run_dir()
         print(f"run_dir: {run_dir}")
         sst_test_suites_results_dict_outer = results.testsuitesresultsdict
         sst_test_suites_results_dict = sst_test_suites_results_dict_outer.testsuitesresultsdict
@@ -787,14 +794,6 @@ class TestEngine:
 
         testcases = dict()
         for testcase_name, result_data in sst_test_suites_results_dict.items():
-            # results_testcase_name = {
-            #     NAME_ERRORED: dict(),
-            #     NAME_EXPECTEDFAILED: dict(),
-            #     NAME_FAILED: dict(),
-            #     NAME_PASSED: dict(),
-            #     NAME_SKIPPED: dict(),
-            #     NAME_UNEXPECTEDSUCCESS: dict(),
-            # }
             results_testcase_name = list()
             errored = result_data.get_errored()
             for testcase_method in errored:
@@ -851,6 +850,9 @@ class TestEngine:
             }
         to_serialize = {
             "testcases": testcases,
+            # NAME_RUNTIME: sum(
+            #     testcase.get(NAME_RUNTIME, 0.0) for testcase in testcases
+            # )
         }
         from pprint import pprint
         breakpoint()

@@ -26,8 +26,8 @@ import json
 
 import test_engine_globals
 from sst_unittest import *
-from sst_unittest_support import *
-from test_engine_unittest import *
+from sst_unittest_support import log_fatal, log_forced, log_info, log
+from test_engine_unittest import SSTTextTestResult, SSTTextTestRunner, SSTTestSuite, verify_concurrent_test_engine_available
 
 ################################################################################
 
@@ -767,6 +767,8 @@ class TestEngine:
 
         return new_suite
 
-    def _save_results(self, results: SSTTextTestResult) -> None:
+    def _save_results(self, results: "SSTTextTestResult") -> None:
+        breakpoint()
         run_dir = test_engine_globals.TESTOUTPUT_RUNDIRPATH
         print(f"run_dir: {run_dir}")
+        test_suites_results_dict = results.testsuitesresultsdict

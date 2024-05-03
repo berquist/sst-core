@@ -23,6 +23,8 @@ import time
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 
+from sst_unittest_support import log_forced, log_fatal, log_info
+
 ################################################################################
 
 def check_module_conditional_import(module_name: str) -> bool:
@@ -129,7 +131,7 @@ class SSTTextTestRunner(unittest.TextTestRunner):
 
 ###
 
-    def run(self, test) -> SSTTextTestResult:
+    def run(self, test) -> "SSTTextTestResult":
         """ Run the tests."""
         testing_start_time = time.time()
         runresults = super(SSTTextTestRunner, self).run(test)
@@ -140,7 +142,7 @@ class SSTTextTestRunner(unittest.TextTestRunner):
 
 ###
 
-    def did_tests_pass(self, run_results):
+    def did_tests_pass(self, run_results) -> bool:
         """ Figure out if testing passed.
 
             Args:
@@ -267,7 +269,13 @@ class SSTTextTestResult(unittest.TestResult):
         lexer = Lexer()
 
 
-    def __init__(self, stream, descriptions, verbosity, no_colour_output=False):
+    def __init__(
+        self,
+        stream,
+        descriptions,
+        verbosity: int,
+        no_colour_output: bool = False,
+    ):
         super(SSTTextTestResult, self).__init__(stream, descriptions, verbosity)
         self.testsuitesresultsdict = SSTTestSuitesResultsDict()
         self._test_name = "undefined_testname"
@@ -283,12 +291,12 @@ class SSTTextTestResult(unittest.TestResult):
         else:
             self.no_colour_output = True
 
-    def toDict(self) -> Dict[str, Union[str, float]]:
-        return {
-            # "desc_short": self.get_
-            # "result": "",
-            "walltime": self.get_test_runtime_sec(),
-        }
+    # def toDict(self) -> Dict[str, Union[str, float]]:
+    #     return {
+    #         # "desc_short": self.get_
+    #         # "result": "",
+    #         "walltime": self.get_test_runtime_sec(),
+    #     }
 
     def getShortDescription(self, test) -> str:
         doc_first_line = test.shortDescription()

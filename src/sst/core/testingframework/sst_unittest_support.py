@@ -27,6 +27,7 @@ import shutil
 import difflib
 import configparser
 from typing import Tuple
+from pathlib import Path
 
 import test_engine_globals
 from test_engine_support import OSCommand
@@ -35,6 +36,7 @@ from test_engine_support import check_param_type
 ################################################################################
 
 OS_DIST_OSX = "OSX"
+OS_DIST_ARCH = "ARCH"
 OS_DIST_CENTOS = "CENTOS"
 OS_DIST_RHEL = "RHEL"
 OS_DIST_TOSS = "TOSS"
@@ -222,6 +224,8 @@ def host_os_get_distribution_type():
     if k_type == 'Linux':
         lin_dist = _get_linux_distribution()
         dist_name = lin_dist[0].lower()
+        if "arch" in dist_name:
+            return OS_DIST_ARCH
         if "centos" in dist_name:
             return OS_DIST_CENTOS
         if "red hat" in dist_name:
@@ -1621,10 +1625,10 @@ def _get_linux_distribution() -> Tuple[str, str]:
     elif os.path.isfile("/etc/redhat-release"):
         distname = "red hat"
         distver = _get_linux_version("/etc/redhat-release", " ")
-    elif os.path.isfile("/etc/lsb-release"):
-        # Until we have other OS's, this is Ubuntu.
-        distname = "ubuntu"
-        distver = _get_linux_version("/etc/lsb-release", " ")
+    elif os.path.isfile("/etc/os-release"):
+        distname, distver = _read_os_release("/etc/os-release")
+        # distname = "ubuntu"
+        # distver = _get_linux_version("/etc/lsb-release", " ")
     rtn_data = (distname, distver)
     return rtn_data
 
@@ -1642,6 +1646,17 @@ def _get_linux_version(filepath: str, sep: str) -> str:
                     found_ver = m_data.string[m_data.start():m_data.end()]
                     return found_ver
     return "undefined"
+
+
+def _read_os_release(filepath: str) -> Tuple[str, str]:
+    """Read key-value pairs from a file that looks like /etc/os-release."""
+    lines = Path(filepath).read_text(encoding="utf-8").splitlines()
+    entries = dict()
+    for line in lines:
+        if line.strip() and not line.startswith("#"):
+            key, value = line.strip().split("=", 1)
+            entries[key] = value
+    return entries["PRETTY_NAME"], entries["BUILD_ID"]
 
 
 ################################################################################

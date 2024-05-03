@@ -768,7 +768,10 @@ class TestEngine:
         return new_suite
 
     def _save_results(self, results: "SSTTextTestResult") -> None:
-        breakpoint()
         run_dir = test_engine_globals.TESTOUTPUT_RUNDIRPATH
         print(f"run_dir: {run_dir}")
-        test_suites_results_dict = results.testsuitesresultsdict
+        sst_test_suites_results_dict_outer = results.testsuitesresultsdict
+        sst_test_suites_results_dict = sst_test_suites_results_dict_outer.testsuitesresultsdict
+        for testcase_name, result_data in sst_test_suites_results_dict.items():
+            breakpoint()
+            passing = result_data.get_passing()

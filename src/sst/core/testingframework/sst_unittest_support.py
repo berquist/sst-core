@@ -26,7 +26,7 @@ import tarfile
 import shutil
 import difflib
 import configparser
-from typing import Tuple
+from typing import Any, List, Tuple
 from pathlib import Path
 
 import test_engine_globals
@@ -52,10 +52,10 @@ pin_exec_path = ""
 class SSTTestCaseException(Exception):
     """ Generic Exception support for SSTTestCase
     """
-    def __init__(self, value):
+    def __init__(self, value) -> None:
         super(SSTTestCaseException, self).__init__(value)
         self.value = value
-    def __str__(self):
+    def __str__(self) -> str:
         return repr(self.value)
 
 ################################################################################
@@ -64,7 +64,7 @@ class SSTTestCaseException(Exception):
 # Commandline Information Functions
 ################################################################################
 
-def testing_check_is_in_debug_mode():
+def testing_check_is_in_debug_mode() -> bool:
     """ Identify if test frameworks is in debug mode
 
         Returns:
@@ -74,7 +74,7 @@ def testing_check_is_in_debug_mode():
 
 ###
 
-def testing_check_is_in_log_failures_mode():
+def testing_check_is_in_log_failures_mode() -> bool:
     """ Identify if test frameworks is in log failures mode
 
         Returns:
@@ -84,7 +84,7 @@ def testing_check_is_in_log_failures_mode():
 
 ###
 
-def testing_check_is_in_concurrent_mode():
+def testing_check_is_in_concurrent_mode() -> bool:
     """ Identify if test frameworks is in concurrent mode
 
         Returns:
@@ -94,7 +94,7 @@ def testing_check_is_in_concurrent_mode():
 
 ###
 
-def testing_check_get_num_ranks():
+def testing_check_get_num_ranks() -> int:
     """ Get the number of ranks defined to be run during testing
 
         Returns:
@@ -104,7 +104,7 @@ def testing_check_get_num_ranks():
 
 ###
 
-def testing_check_get_num_threads():
+def testing_check_get_num_threads() -> int:
     """ Get the number of threads defined to be run during testing
 
         Returns:
@@ -116,7 +116,7 @@ def testing_check_get_num_threads():
 # PIN Information Functions
 ################################################################################
 
-def testing_is_PIN_loaded():
+def testing_is_PIN_loaded() -> bool:
     # Look to see if PIN is available
     pindir_found = False
     pin_path = os.environ.get('INTEL_PIN_DIRECTORY')
@@ -125,9 +125,9 @@ def testing_is_PIN_loaded():
     #log_debug("testing_is_PIN_loaded() - Intel_PIN_Path = {0}; Valid Dir = {1}".format(pin_path, pindir_found))
     return pindir_found
 
-def testing_is_PIN_Compiled():
+def testing_is_PIN_Compiled() -> bool:
     global pin_exec_path
-    pin_crt = sst_elements_config_include_file_get_value_int("HAVE_PINCRT", 0, True)
+    _pin_crt = sst_elements_config_include_file_get_value_int("HAVE_PINCRT", 0, True)
     pin_exec = sst_elements_config_include_file_get_value_str("PINTOOL_EXECUTABLE", "", True)
     #log_debug("testing_is_PIN_Compiled() - Detected PIN_CRT = {0}".format(pin_crt))
     #log_debug("testing_is_PIN_Compiled() - Detected PIN_EXEC = {0}".format(pin_exec))
@@ -136,7 +136,7 @@ def testing_is_PIN_Compiled():
     #log_debug("testing_is_PIN_Compiled() - Rtn {0}".format(rtn))
     return rtn
 
-def testing_is_PIN2_used():
+def testing_is_PIN2_used() -> bool:
     global pin_exec_path
     if testing_is_PIN_Compiled():
         if "/pin.sh" in pin_exec_path:
@@ -149,7 +149,7 @@ def testing_is_PIN2_used():
         #log_debug("testing_is_PIN2_used() - Rtn False because PIN Not Compiled")
         return False
 
-def testing_is_PIN3_used():
+def testing_is_PIN3_used() -> bool:
     global pin_exec_path
     if testing_is_PIN_Compiled():
         if testing_is_PIN2_used():
@@ -174,7 +174,7 @@ def testing_is_PIN3_used():
 # System Information Functions
 ################################################################################
 
-def host_os_get_system_node_name():
+def host_os_get_system_node_name() -> str:
     """ Get the node name of the system
 
         Returns:
@@ -184,7 +184,7 @@ def host_os_get_system_node_name():
 
 ###
 
-def host_os_get_kernel_type():
+def host_os_get_kernel_type() -> str:
     """ Get the Kernel Type
 
         Returns:
@@ -192,7 +192,7 @@ def host_os_get_kernel_type():
     """
     return platform.system()
 
-def host_os_get_kernel_release():
+def host_os_get_kernel_release() -> str:
     """ Get the Kernel Release number
 
         Returns:
@@ -200,7 +200,7 @@ def host_os_get_kernel_release():
     """
     return platform.release()
 
-def host_os_get_kernel_arch():
+def host_os_get_kernel_arch() -> str:
     """ Get the Kernel System Arch
 
         Returns:
@@ -208,7 +208,7 @@ def host_os_get_kernel_arch():
     """
     return platform.machine()
 
-def host_os_get_distribution_type():
+def host_os_get_distribution_type() -> str:
     """ Get the os distribution type
 
         Returns:
@@ -238,7 +238,7 @@ def host_os_get_distribution_type():
         return OS_DIST_OSX
     return OS_DIST_UNDEF
 
-def host_os_get_distribution_version():
+def host_os_get_distribution_version() -> str:
     """ Get the os distribution version
 
         Returns:
@@ -255,57 +255,7 @@ def host_os_get_distribution_version():
 
 ###
 
-def host_os_is_osx():
-    """ Check if OS distribution is OSX
-
-        Returns:
-            (bool) True if OS Distribution is OSX
-    """
-    return host_os_get_distribution_type() == OS_DIST_OSX
-
-def host_os_is_linux():
-    """ Check if OS distribution is Linux
-
-        Returns:
-            (bool) True if OS Distribution is Linux
-    """
-    return not host_os_get_distribution_type() == OS_DIST_OSX
-
-def host_os_is_centos():
-    """ Check if OS distribution is CentOS
-
-        Returns:
-            (bool) True if OS Distribution is CentOS
-    """
-    return host_os_get_distribution_type() == OS_DIST_CENTOS
-
-def host_os_is_rhel():
-    """ Check if OS distribution is RHEL
-
-        Returns:
-            (bool) True if OS Distribution is RHEL
-    """
-    return host_os_get_distribution_type() == OS_DIST_RHEL
-
-def host_os_is_toss():
-    """ Check if OS distribution is Toss
-
-        Returns:
-            (bool) True if OS Distribution is Toss
-    """
-    return host_os_get_distribution_type() == OS_DIST_TOSS
-
-def host_os_is_ubuntu():
-    """ Check if OS distribution is Ubuntu
-
-        Returns:
-            (bool) True if OS Distribution is Ubuntu
-    """
-    return host_os_get_distribution_type() == OS_DIST_UBUNTU
-
-###
-
-def host_os_get_num_cores_on_system():
+def host_os_get_num_cores_on_system() -> int:
     """ Get number of cores on the system
 
         Returns:
@@ -318,7 +268,7 @@ def host_os_get_num_cores_on_system():
 # SST Skipping Support
 ################################################################################
 
-def testing_check_is_scenario_filtering_enabled(scenario_name):
+def testing_check_is_scenario_filtering_enabled(scenario_name: str) -> bool:
     """ Determine if a scenario filter name is enabled
 
         Args:
@@ -885,7 +835,7 @@ def testing_parse_stat(line):
     """
     cons_accum = re.compile(r' ([\w.]+)\.(\w+) : Accumulator : Sum.(\w+) = ([\d.]+); SumSQ.\w+ = ([\d.]+); Count.\w+ = ([\d.]+); Min.\w+ = ([\d.]+); Max.\w+ = ([\d.]+);')
     m = cons_accum.match(line)
-    if m == None:
+    if m is None:
         return None
 
     stat = [m.group(1), m.group(2)]
@@ -938,7 +888,7 @@ def testing_stat_output_diff(outfile, reffile, ignore_lines=[], tol_stats={}, ne
         for line in lines:
             if not any(x in line for x in ignore_lines):
                 stat = testing_parse_stat(line)
-                if stat != None:
+                if stat is not None:
                     ref_stats.append(stat)
                 else:
                     ref_lines.append(line)
@@ -949,7 +899,7 @@ def testing_stat_output_diff(outfile, reffile, ignore_lines=[], tol_stats={}, ne
         for line in lines:
             if not any(x in line for x in ignore_lines):
                 stat = testing_parse_stat(line)
-                if stat == None: # Not a statistic
+                if stat is None: # Not a statistic
                     if line not in ref_lines:
                         out_lines.append(line)
                     else:
@@ -1135,7 +1085,13 @@ class RemoveRegexFromLineFilter(LineFilter):
 
 
 ### Diff functions
-def testing_compare_filtered_diff(test_name, outfile, reffile, sort=False, filters=[]):
+def testing_compare_filtered_diff(
+    test_name: str,
+    outfile: str,
+    reffile: str,
+    sort: bool = False,
+    filters: List[Any] = []
+) -> bool:
     """Filter, optionally sort and then compare 2 files for a difference.
 
         Args:
@@ -1338,7 +1294,7 @@ def testing_merge_mpi_files(filepath_wildcard, mpiout_filename, outputfilepath):
 
 ###
 
-def testing_remove_component_warning_from_file(input_filepath):
+def testing_remove_component_warning_from_file(input_filepath: str) -> None:
     """ Remove SST Component warnings from a file
 
         This will re-write back to the file with the removed warnings
@@ -1664,7 +1620,7 @@ def _read_os_release(filepath: str) -> Tuple[str, str]:
 ################################################################################
 
 def _get_sst_config_include_file_value(include_dict, include_source, define, default=None,
-                                       data_type=str, disable_warning = False):
+                                       data_type=str, disable_warning: bool = False):
     """ Retrieve a define from an SST Configuration Include File (sst_config.h or sst-element_config.h)
        include_dict (dict): The dictionary to search for the define
        include_source (str): The name of the include file we are searching
@@ -1685,9 +1641,8 @@ def _get_sst_config_include_file_value(include_dict, include_source, define, def
     try:
         rtn_data = include_dict[define]
     except KeyError as exc_e:
-        errmsg = ("Reading Config include file {0}") \
-                 + (" - Cannot find #define {1}".format(include_source, exc_e))
-        if disable_warning == False:
+        errmsg = f"Reading Config include file {include_source} - Cannot find #define {exc_e}"
+        if not disable_warning:
             log_warning(errmsg)
         if default is None:
             raise SSTTestCaseException(exc_e)
@@ -1737,17 +1692,17 @@ def _handle_config_err(exc_e, default_rtn_data):
 
 ###
 
-def _remove_lines_with_string_from_file(removestring, input_filepath):
+def _remove_lines_with_string_from_file(removestring: str, input_filepath: str) -> None:
     bad_strings = [removestring]
 
     # Create a temp file
     filename = os.path.basename(input_filepath)
-    tmp_output_filepath = "{0}/{1}.removed_lines".format(test_output_get_tmp_dir(), filename)
-    bak_output_filepath = "{0}/{1}.bak".format(test_output_get_tmp_dir(), filename)
+    tmp_dir = test_output_get_tmp_dir()
+    tmp_output_filepath = f"{tmp_dir}/{filename}.removed_lines"
+    bak_output_filepath = f"{tmp_dir}/{filename}.bak"
 
     if not os.path.exists(input_filepath):
-        log_error("_remove_lines_with_string_from_file() - File {0} does not exist".\
-            format(input_filepath))
+        log_error(f"_remove_lines_with_string_from_file() - File {input_filepath} does not exist")
         return
 
     # Copy the lines in the input file line by line, to a backup file and to the

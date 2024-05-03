@@ -23,7 +23,7 @@ import time
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 
-from sst_unittest_support import log_forced, log_fatal, log_info
+from sst_unittest_support import log_forced, log_fatal, log_info, log
 
 ################################################################################
 
@@ -73,15 +73,15 @@ else:
     TestSuiteBaseClass = unittest.TestSuite
 
 import test_engine_globals
-from sst_unittest import *
-from sst_unittest_support import *
+from sst_unittest import SSTTestCase, setUpModuleConcurrent, tearDownModuleConcurrent
+#from sst_unittest_support import *
 from test_engine_support import strclass
 from test_engine_support import strqual
 from test_engine_junit import JUnitTestCase
 
 ################################################################################
 
-def verify_concurrent_test_engine_available():
+def verify_concurrent_test_engine_available() -> None:
     """ Check to see if we can load testtools if the user wants to run
         in concurrent mode.
 
@@ -122,10 +122,7 @@ class SSTTextTestRunner(unittest.TextTestRunner):
             log_info(("Full colorized output can be obtained by running") +
                      (" 'pip install blessings pygments'"), forced=False)
 
-        if blessings_loaded:
-            self.no_colour_output = no_colour_output
-        else:
-            self.no_colour_output = True
+        self.no_colour_output = no_colour_output if blessings_loaded else True
 
         log("\n=== TESTS STARTING " + ("=" * 51))
 
@@ -239,7 +236,7 @@ class SSTTextTestRunner(unittest.TextTestRunner):
 
 class SSTTextTestResult(unittest.TestResult):
     """ A superclass to support SST required testing, this is a modified version
-        of unittestTextTestResult from python 2.7 modified for SST's needs.
+        of unittest.TextTestResult from python 2.7 modified for SST's needs.
     """
     separator1 = '=' * 70
     separator2 = '-' * 70

@@ -768,10 +768,90 @@ class TestEngine:
         return new_suite
 
     def _save_results(self, results: "SSTTextTestResult") -> None:
+        to_serialize = dict()
         run_dir = test_engine_globals.TESTOUTPUT_RUNDIRPATH
         print(f"run_dir: {run_dir}")
         sst_test_suites_results_dict_outer = results.testsuitesresultsdict
         sst_test_suites_results_dict = sst_test_suites_results_dict_outer.testsuitesresultsdict
+
+        NAME_TESTNAME = "testname"
+        NAME_STATUS = "status"
+        NAME_RUNTIME = "runtime"
+
+        NAME_ERRORED = "errored"
+        NAME_EXPECTEDFAILED = "expectedfailed"
+        NAME_FAILED = "failed"
+        NAME_PASSED = "passed"
+        NAME_SKIPPED = "skipped"
+        NAME_UNEXPECTEDSUCCESS = "unexpectedsuccess"
+
+        testcases = dict()
         for testcase_name, result_data in sst_test_suites_results_dict.items():
-            breakpoint()
+            # results_testcase_name = {
+            #     NAME_ERRORED: dict(),
+            #     NAME_EXPECTEDFAILED: dict(),
+            #     NAME_FAILED: dict(),
+            #     NAME_PASSED: dict(),
+            #     NAME_SKIPPED: dict(),
+            #     NAME_UNEXPECTEDSUCCESS: dict(),
+            # }
+            results_testcase_name = list()
+            errored = result_data.get_errored()
+            for testcase_method in errored:
+                entry = {
+                    NAME_TESTNAME: testcase_method.id(),
+                    NAME_STATUS: NAME_ERRORED,
+                    NAME_RUNTIME: testcase_method.get_test_runtime_sec(),
+                }
+                results_testcase_name.append(entry)
+            expectedfailed = result_data.get_expectedfailed()
+            for testcase_method in expectedfailed:
+                entry = {
+                    NAME_TESTNAME: testcase_method.id(),
+                    NAME_STATUS: NAME_EXPECTEDFAILED,
+                    NAME_RUNTIME: testcase_method.get_test_runtime_sec(),
+                }
+                results_testcase_name.append(entry)
+            failed = result_data.get_failed()
+            for testcase_method in failed:
+                entry = {
+                    NAME_TESTNAME: testcase_method.id(),
+                    NAME_STATUS: NAME_FAILED,
+                    NAME_RUNTIME: testcase_method.get_test_runtime_sec(),
+                }
+                results_testcase_name.append(entry)
             passing = result_data.get_passing()
+            for testcase_method in passing:
+                entry = {
+                    NAME_TESTNAME: testcase_method.id(),
+                    NAME_STATUS: NAME_PASSED,
+                    NAME_RUNTIME: testcase_method.get_test_runtime_sec(),
+                }
+                results_testcase_name.append(entry)
+            skipped = result_data.get_skipped()
+            for testcase_method in skipped:
+                entry = {
+                    NAME_TESTNAME: testcase_method.id(),
+                    NAME_STATUS: NAME_SKIPPED,
+                }
+                results_testcase_name.append(entry)
+            unexpectedsuccess = result_data.get_unexpectedsuccess()
+            for testcase_method in unexpectedsuccess:
+                entry = {
+                    NAME_TESTNAME: testcase_method.id(),
+                    NAME_STATUS: NAME_UNEXPECTEDSUCCESS,
+                    NAME_RUNTIME: testcase_method.get_test_runtime_sec(),
+                }
+                results_testcase_name.append(entry)
+            testcases[testcase_name] = {
+                "individual_tests": results_testcase_name,
+                NAME_RUNTIME: sum(
+                    entry.get(NAME_RUNTIME, 0.0) for entry in results_testcase_name
+                ),
+            }
+        to_serialize = {
+            "testcases": testcases,
+        }
+        from pprint import pprint
+        breakpoint()
+        pprint(to_serialize)

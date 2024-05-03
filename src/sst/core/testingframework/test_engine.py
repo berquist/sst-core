@@ -23,6 +23,7 @@ import argparse
 import shutil
 import configparser
 import json
+from pathlib import Path
 
 import test_engine_globals
 from sst_unittest import *
@@ -107,7 +108,7 @@ MODE_TEST_SST_CORE = 1
 
 class Config:
     def __init__(self):
-        self.python_version = self.version_info
+        self.python_version = sys.version_info
         cmd = "sst --version"
         rtn = OSCommand(cmd).run()
         sstcoreversion = rtn.output()
@@ -776,8 +777,7 @@ class TestEngine:
 
     def _save_results(self, results: "SSTTextTestResult") -> None:
         to_serialize = dict()
-        run_dir = test_output_get_run_dir()
-        print(f"run_dir: {run_dir}")
+        run_dir = Path(test_output_get_run_dir())
         sst_test_suites_results_dict_outer = results.testsuitesresultsdict
         sst_test_suites_results_dict = sst_test_suites_results_dict_outer.testsuitesresultsdict
 
@@ -850,10 +850,13 @@ class TestEngine:
             }
         to_serialize = {
             "testcases": testcases,
+            NAME_RUNTIME: 0.0,
             # NAME_RUNTIME: sum(
             #     testcase.get(NAME_RUNTIME, 0.0) for testcase in testcases
             # )
         }
-        from pprint import pprint
-        breakpoint()
-        pprint(to_serialize)
+        # from pprint import pprint
+        # breakpoint()
+        # pprint(to_serialize)
+        with open(run_dir / "results.json", "w") as results_file_handle:
+            json.dump(to_serialize, results_file_handle, indent=2)

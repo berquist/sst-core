@@ -22,6 +22,7 @@ import unittest
 import argparse
 import shutil
 import configparser
+import json
 
 import test_engine_globals
 from sst_unittest import *
@@ -182,7 +183,8 @@ class TestEngine:
             # run the tests
             sst_tests_results = test_runner.run(self._sst_full_test_suite)
 
-            # save the results
+            # Save the results, serialized to JSON
+            self._save_results(sst_tests_results)
 
             if not test_runner.did_tests_pass(sst_tests_results):
                 exit(1)
@@ -764,3 +766,7 @@ class TestEngine:
                 new_suite.addTest(suite)
 
         return new_suite
+
+    def _save_results(self, results: SSTTextTestResult) -> None:
+        run_dir = test_engine_globals.TESTOUTPUT_RUNDIRPATH
+        print(f"run_dir: {run_dir}")

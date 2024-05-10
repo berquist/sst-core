@@ -29,7 +29,7 @@ import threading
 import time
 
 import test_engine_globals
-from sst_unittest_support import host_os_get_num_cores_on_system, host_os_get_distribution_type, host_os_get_distribution_version, log_debug, sstsimulator_conf_get_value_str, log_error, host_os_get_num_cores_on_system, testing_merge_mpi_files, log_fatal
+from sst_unittest_support import host_os_get_num_cores_on_system, host_os_get_distribution_type, host_os_get_distribution_version, log_debug, sstsimulator_conf_get_value_str, log_error, testing_merge_mpi_files, log_fatal, test_output_get_run_dir, test_output_get_tmp_dir
 from test_engine_support import OSCommand
 from test_engine_support import check_param_type
 from test_engine_support import strclass

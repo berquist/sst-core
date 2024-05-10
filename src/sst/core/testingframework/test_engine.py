@@ -27,7 +27,7 @@ from pathlib import Path
 
 import test_engine_globals
 from sst_unittest import *
-from sst_unittest_support import log_fatal, log_forced, log_info, log, test_output_get_run_dir, log_testing_note
+from sst_unittest_support import log_fatal, log_forced, log_info, log, test_output_get_run_dir, log_testing_note, log_warning, log_error, log_debug, host_os_get_distribution_version, host_os_get_distribution_type, host_os_get_num_cores_on_system, sstsimulator_conf_get_value_str
 from test_engine_unittest import SSTTextTestResult, SSTTextTestRunner, SSTTestSuite, verify_concurrent_test_engine_available
 from test_engine_support import OSCommand
 
@@ -183,7 +183,7 @@ class TestEngine:
             # dump the discovered testsuites and tests
             log("\nDISCOVERED TESTS:")
             self._dump_testsuite_list(self._sst_full_test_suite, log_normal=True)
-            return 0
+            return
 
         # Now run the testsuites, looking for a keyboard interrupt if necessary
         # to stop testing.

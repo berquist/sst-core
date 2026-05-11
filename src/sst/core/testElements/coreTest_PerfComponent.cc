@@ -124,7 +124,9 @@ coreTestPerfComponent::clockTic(Cycle_t)
     // As this is meant to test the performance counter infrastructure,
     // we'll give this loop more to do - trig functions are typically
     // quite slow so this should eat up some CPU cycles
-    volatile int    v   = 0;
+    DISABLE_WARN_UNUSED_BUT_SET_VARIABLE
+    volatile int v = 0;
+    REENABLE_WARNING
     volatile double sum = 0.0;
     for ( int i = 0; i < workPerCycle; ++i ) {
         sum = sum + sin(double(i));

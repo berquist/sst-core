@@ -116,7 +116,9 @@ coreTestComponent::clockTic(Cycle_t)
         6 instructions.
     */
 
+    DISABLE_WARN_UNUSED_BUT_SET_VARIABLE
     volatile int v = 0;
+    REENABLE_WARNING
     for ( int i = 0; i < workPerCycle; ++i ) {
         v += 1;
     }

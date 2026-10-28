@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # core_autotools_noflags_nodeps_nompi.sh: Compile and install core, using the
 # Autotools build system, without explicitly specifying any additional build

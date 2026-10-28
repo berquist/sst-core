@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # elements_autotools_noflags_nodeps.sh: TODO
 
